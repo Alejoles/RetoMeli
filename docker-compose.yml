@@ -10,3 +10,5 @@ services:
       - ./app:/app
     command: >
       sh -c "python main.py"
+
+  db:
