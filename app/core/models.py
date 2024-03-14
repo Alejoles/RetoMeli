@@ -3,13 +3,13 @@ from mongoengine import (
     StringField,
     FloatField,
     DateTimeField,
-    IntField
 )
 
 
-class Item(Document):
-    site = StringField(required=True)
-    id = IntField(required=True, unique=True)
+class ItemModel(Document):
+    meta = {"collection": "items"}
+    site = StringField()
+    file_id = StringField()
     price = FloatField()
     start_time = DateTimeField()
     name = StringField()
