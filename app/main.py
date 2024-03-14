@@ -1,15 +1,23 @@
+import os
+import mongoengine
+from dotenv import load_dotenv
 from flask import Flask
 from api.routes import (
     read_bp,
     index_bp
 )
 
+load_dotenv()
+
 
 app = Flask(__name__)
-
-
 app.register_blueprint(index_bp, route_prefix='')
 app.register_blueprint(read_bp, route_prefix='/api/v1')
+
+
+mongoengine.connect(
+        host=os.environ.get("MONGO_URI")
+    )
 
 
 if __name__ == "__main__":
