@@ -32,7 +32,7 @@ def index():
 def read_file():
     data_1 = {
         "site": "sitetest",
-        "file_id": "12341245",
+        "file_id": "1234123",
         "price": 5678,
         "start_time": datetime.datetime.now,
         "name": "name test",
@@ -40,9 +40,10 @@ def read_file():
         "nickname": "nicknametest",
     }
     data = create_item(data_1)
+    print(data)
     response = Response(
-        json.dumps(data),
-        status=data.http_code,
+        response="OK",
+        status=data["http_code"],
         mimetype='application/json'
     )
     return response

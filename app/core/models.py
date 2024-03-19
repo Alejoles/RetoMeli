@@ -9,7 +9,7 @@ from mongoengine import (
 class ItemModel(Document):
     meta = {"collection": "items"}
     site = StringField()
-    file_id = StringField()
+    file_id = StringField(unique=True)
     price = FloatField()
     start_time = DateTimeField()
     name = StringField()

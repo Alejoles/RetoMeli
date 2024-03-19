@@ -1,12 +1,12 @@
 version: "3.9"
 
 services:
-  app:
+  app: # Nombre de la aplicación que ejecutará el servicio principal
     build:
       context: .
     ports:
       - "8000:8000"
-    volumes:
+    volumes: # En donde tendrán persistencia los datos
       - ./app:/app
     env_file:
       - .env
@@ -17,9 +17,9 @@ services:
     networks:
       - newbridge
 
-  db:
+  db: # Nombre / Identificador de la base de datos a la que nos conectaremos
     image: mongo:latest
-    volumes:
+    volumes: # En donde tendrán persistencia los datos
       - mongo-data:/data/db
     ports:
       - "27018:27017"
