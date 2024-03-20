@@ -1,10 +1,10 @@
 from flask import Blueprint, Response
-from core.process import create_item
+from core.process import process_data
 import json
-import datetime
 
-read_bp = Blueprint('read', __name__)
+process_bp = Blueprint('process', __name__)
 index_bp = Blueprint('index', __name__)
+database_bp = Blueprint('database', __name__)
 
 
 """
@@ -24,26 +24,23 @@ def index():
 
 
 """
-    Read path
+    Process path
 """
 
 
-@read_bp.route("/read_file")
-def read_file():
-    data_1 = {
-        "site": "sitetest",
-        "file_id": "1234123",
-        "price": 5678,
-        "start_time": datetime.datetime.now,
-        "name": "name test",
-        "description": "description test",
-        "nickname": "nicknametest",
-    }
-    data = create_item(data_1)
-    print(data)
+@process_bp.route("/process")
+def process_file():
+    data = process_data()
     response = Response(
-        response="OK",
+        response=json.dumps({
+            "message": data["message"]
+            }),
         status=data["http_code"],
         mimetype='application/json'
     )
     return response
+
+
+@database_bp.route("/find_one/<string:id>")
+def get_item(id):
+    pass

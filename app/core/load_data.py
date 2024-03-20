@@ -3,18 +3,18 @@ import json
 import yaml
 import pandas as pd
 import logging as log
-import constants
+from . import constants
 
 
 class FileReader:
-    def __init__(self, filename, has_header=True, skip_lines=0):
+    def __init__(self, has_header=True, skip_lines=0):
         self.filename = constants.FILE_NAME
-        self.format_type = str(filename).split(".")[-1]
+        self.format_type = str(constants.FILE_NAME).split(".")[-1]
         self.delimiter = constants.SEPARATOR
         self.encoding = constants.ENCODING
         self.has_header = has_header
         self.skip_lines = skip_lines
-        self.batch_size = constants.BATCH_SIZE
+        self.batch_size = int(constants.BATCH_SIZE)
 
     def read_file(self):
         with open(self.filename, 'r', encoding=self.encoding) as file:
@@ -121,13 +121,3 @@ class FileReader:
             log.error(f"Error loading YAML: {e}")
         if batch:
             yield batch
-
-
-# Crear un objeto FileReader con un tamaño de lote de 100 bytes
-file_reader = FileReader('files/example.csv', batch_size=100)
-
-# Iterar sobre los lotes de datos y procesarlos
-for batch in file_reader.read_file():
-    # Procesar cada lote de datos
-    for row in batch:
-        print(row)

@@ -1,4 +1,5 @@
 from core.models import ItemModel
+from mongoengine.errors import NotUniqueError
 
 
 class ItemRepository:
@@ -11,11 +12,11 @@ class ItemRepository:
         return ItemModel.objects(**params).first()
 
     @staticmethod
-    def find_many_items(filters) -> list:
-        finded_items = ItemModel.objects(**filters)
-        return finded_items
-
-    @staticmethod
     def insert_one_item(data):
-        tag = ItemModel(**data)
-        return tag.save()
+        try:
+            if ItemModel.objects(**data).count() > 0:
+                raise NotUniqueError
+            tag = ItemModel(**data)
+            return tag.save()
+        except NotUniqueError as e:
+            return str(e)

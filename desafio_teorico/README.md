@@ -8,7 +8,7 @@ Podríamos usar procesos en una tarea que se pueda separar en tareas que sean in
 
 - **Un caso en el que usarías threads para resolver un problema y por qué.**
 
-Respuesta
+Se podrían usar threads en tareas que requieran procesamiento de datos en paralelo, se podría usar en una aplicación que deba de realizar muchas peticiones a algún endpoint, entonces se podrían usar por ejemplo 30 hilos para hacer 30 peticiones simultaneamente y que el programa se demore mucho menos de lo que lo haría normalmente si no se implementan estos.
 
 - **Un caso en el que usarías corrutinas para resolver un problema y por qué.**
 
@@ -20,7 +20,12 @@ Respuesta
 
 - **Si tuvieras 1.000.000 de elementos y tuvieras que consultar para cada uno de ellos información en una API HTTP. ¿Cómo lo harías? Explicar**
 
-Respuesta
+Primero buscaría la forma de obtener la mayor cantidad de elementos de una request, para esto el servicio debería de aceptar algún tipo de multiget, así no se harían 1’000.000 de peticiones si no que se acortaría, habría que mirar los recursos con los que cuento para ver si es necesario un procesamiento por lotes, de todas formas sería mejor hacerlo por lotes dado al tamaño de lo que se quiere consultar, se podrían usar hilos (threads) si se quiere realizar el proceso más rápido ya que consultar 1’000.000 de elementos de 1 a 1 se tardaría mucho si no se tiene un multiget. Al tratarse de tantos archivos tampoco queremos que se consulten archivos dos veces por lo que se podría implementar un sistema de caché que guarde los archivos ya consultados. Se podría ver de la siguiente forma:
+
+- Analizar el endpoint de consulta para tomar decisiones de diseño de programa.
+- Ver si con los recursos que cuento puedo realizar el proceso de 1’000.000 de datos o habría que realizarlo por lotes.
+- Verificar viabilidad de uso de hilos (threads) a la hora de realizar las peticiones para que el proceso no demore mucho.
+- Implementar sistema de caché que guarde elementos ya consultados.
 
 ---
 
