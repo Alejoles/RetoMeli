@@ -97,3 +97,18 @@ def process_data_with_threads(num_threads):
                 "message": f"Internal Server Error, datails: {e}",
                 "http_code": 500
             }
+
+
+def get_item_from_db(id: str):
+    site = id[:3]
+    file_id = id[3:]
+    element = ItemRepository.find_one_active(site=site, file_id=file_id)
+    if element:
+        return {
+                "message": element.to_json(),
+                "http_code": 200
+            }
+    return {
+                "message": "No element found with id given",
+                "http_code": 404
+            }

@@ -1,5 +1,5 @@
 from flask import Blueprint, Response
-from core.process import process_data_with_threads
+from core.process import process_data_with_threads, get_item_from_db
 import json
 from core import constants
 
@@ -44,4 +44,12 @@ def process_file():
 
 @database_bp.route("/find_one/<string:id>", methods=["GET"])
 def get_item_db(id):
-    print(id)
+    data = get_item_from_db(id)
+    response = Response(
+        response=json.dumps({
+            "data": data["message"]
+            }),
+        status=data["http_code"],
+        mimetype='application/json'
+    )
+    return response

@@ -28,3 +28,19 @@ class ItemModel(Document):
     name = StringField()
     description = StringField()
     nickname = StringField()
+
+    def to_json(self):
+        """
+            Convert the ItemModel instance to a dictionary.
+
+            Returns:
+            dict: A dictionary containing the item's attributes.
+        """
+        return {
+            'site': self.site,
+            'file_id': self.file_id,
+            'price': self.price,
+            'name': self.name,
+            'description': self.description,
+            'nickname': self.nickname
+        }
