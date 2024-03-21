@@ -21,24 +21,15 @@
 
     [Get Started With Docker](https://www.docker.com/get-started/)
 
-
-- **Flask**
-
-    [Installation - Flask](https://flask.palletsprojects.com/en/3.0.x/installation/)
+Everything will be executed inside docker, you dont need aditional instalations.
 
 ---
 
 ### Environment Vars.
 
-MONGO_URI=mongodb://db/reto_meli
-BASE_API_URL=https://api.mercadolibre.com/
+The environment variables must be setted inside a **.env** file, inside the project a .env already exists, theres no need to create aditional **.env** files, you can modify the existing **.env** file.
 
-
-FILE_NAME=/files/technical_challenge_data.csv
-SEPARATOR=,
-ENCODING=utf-8
-BATCH_SIZE=10
-THREADS_NUMBER=20  # Number of threads that will be using the application to make requests.
+The **.env** file will be public for the project purposes but in other projects it should be private.
 
 - **MONGO_URI:** This variable is the connection to the mongo database, it is in this form so that it connects via docker, preferably leave as is
 - **BASE_API_URL:** Variable used to store MeLi api address
@@ -48,6 +39,7 @@ THREADS_NUMBER=20  # Number of threads that will be using the application to mak
 - **BATCH_SIZE:** Batch size used when reading the text file to process data in batches
 - **THREADS_NUMBER:** Number of threads that will be used when querying the API to speed up the process
 
+The values used in some test are the following:
 
 | ENV_VAR | Value |
 | --- | --- |
@@ -81,7 +73,7 @@ Once the docker container is up you can go ahead and try the endpoints.
 
 - ### [GET] localhost:8000/process
 
-This endpoint will execute the full program, it will read the file and then do the requests to MeLi's API.
+**This endpoint will execute the full program**, it will read the file and then do the requests to MeLi's API.
 
 ```sh
 curl --location 'localhost:8000/process'
@@ -99,6 +91,20 @@ curl --location 'localhost:8000/find_one/MLA828617220'
 
 ## Project Structure
 
+![alt text](image.png)
+
+The project itself is inside the app folder, we will found 2 folders and 1 file inside app folder.
+
+- api (folder)
+    - Here inside api folder we will found everything abount requests to api and our endpoints.
+
+- core (folder)
+    - Inside core folder we will found the files needed to process data, manage database, and constants.
+
+- main.py (file)
+    - This is the main file of the project, it will execute the connection to the database and raise the API.
+
+By the other gand we have **files** **folder** that contains all the data in different formats.
 
 # Contact
 

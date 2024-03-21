@@ -3,6 +3,7 @@ import logging as log
 from api.webservice import WebService
 from .load_data import FileReader
 import threading
+from .helpers import GeneralHelpers
 
 
 def process_row(row, list_of_failed, semaphore):
@@ -81,11 +82,12 @@ def process_data_with_threads(num_threads):
                 thread.start()
                 threads.append(thread)
 
+            GeneralHelpers.list_to_jsonl(list_of_failed)
+            list_of_failed = []
+
         # Wait for all threads to finish
         for thread in threads:
             thread.join()
-
-        print(list_of_failed)
 
         return {
             "message": "Successfully Executed",

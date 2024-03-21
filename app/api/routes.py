@@ -16,7 +16,9 @@ database_bp = Blueprint('database', __name__)
 
 @index_bp.route("/")
 def index():
-    data = {'Message': "Project working, go to /api/v1/docs for documentation."}
+    data = {'Message': "Project working, read documentation to run project.",
+            'Endpoints': "localhost:8000/process to run main process \
+                          localhost:8000/find_one/{id} to find items inside database"}
     return Response(
         json.dumps(data),
         status=200,
