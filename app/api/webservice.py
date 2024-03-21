@@ -37,26 +37,30 @@ class WebService:
 
     def __init__(self) -> None:
         self.base_url = constants.BASE_API_URL
-        self.multiget_size = int(constants.MULTIGET_SIZE)
 
-    def get_data_from_items(self, ids: list):
+    def get_data_from_items(self, id: str):
         """
             Method used to fetch data from the item endpoint.
         """
-        items_url = self.base_url + "items"
-        query_params = {
-            'ids': ','.join(ids),
-            'attributes': 'price,start_time,category_id,currency_id,seller_id'
-            }
-        response = requests.get(items_url, params=query_params)
+        items_url = self.base_url + f"items/{id}"
+        response = requests.get(items_url)
         if response.status_code == 200:
             data = response.json()
+            if 'price' not in data:
+                data['error'] = "Item do not have price"
+                return data
             return data
         else:
             print(f"Error while getting items. Status code: : {response.status_code}")
-            return None
+            data = response.json()
+            data["id"] = id
+            return data
 
     def get_data_from_categories(self, category_id: str):
+        """
+            Method used to fetch data from the category endpoint.
+            returns only the category name
+        """
         categories_url = self.base_url + f"categories/{category_id}"
         response = requests.get(categories_url)
         if response.status_code == 200:
@@ -67,6 +71,10 @@ class WebService:
             return None
 
     def get_data_from_currencies(self, currency_id: str):
+        """
+            Method used to fetch data from the currencies endpoint.
+            returns only the currency description
+        """
         currency_url = self.base_url + f"currencies/{currency_id}"
         response = requests.get(currency_url)
         if response.status_code == 200:
@@ -77,6 +85,10 @@ class WebService:
             return None
 
     def get_data_from_users(self, seller_id: str):
+        """
+            Method used to fetch data from the users endpoint.
+            returns only the user nickname
+        """
         users_url = self.base_url + f"users/{seller_id}"
         response = requests.get(users_url)
         if response.status_code == 200:

@@ -10,8 +10,8 @@ from api.routes import (
 
 app = Flask(__name__)
 app.register_blueprint(index_bp, route_prefix='')
-app.register_blueprint(process_bp, route_prefix='/api/v1')
-app.register_blueprint(database_bp, route_prefix='/api/v1')
+app.register_blueprint(process_bp, route_prefix='')
+app.register_blueprint(database_bp, route_prefix='')
 
 
 if __name__ == "__main__":

@@ -7,7 +7,20 @@ from . import constants
 
 
 class FileReader:
+    """
+        Reads data from different file formats.
+
+        This class reads data from various file formats such as CSV, JSONL, TXT, JSON, Excel, and YAML.
+        It provides methods to iterate over the data in batches.
+
+        Attributes:
+        - has_header (bool): Indicates whether the file has a header row (default is True).
+        - skip_lines (int): The number of lines to skip at the beginning of the file (default is 0).
+    """
     def __init__(self, has_header=True, skip_lines=0):
+        """
+            Initializes the FileReader object with default settings.
+        """
         self.filename = constants.FILE_NAME
         self.format_type = str(constants.FILE_NAME).split(".")[-1]
         self.delimiter = constants.SEPARATOR
@@ -17,6 +30,12 @@ class FileReader:
         self.batch_size = int(constants.BATCH_SIZE)
 
     def read_file(self):
+        """
+            Reads data from the file based on its format type.
+
+            Yields:
+            list: A batch of data read from the file.
+        """
         with open(self.filename, 'r', encoding=self.encoding) as file:
             if self.format_type == 'csv':
                 yield from self.read_csv(file)

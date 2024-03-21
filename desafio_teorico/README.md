@@ -12,7 +12,7 @@ Se podrían usar threads en tareas que requieran procesamiento de datos en paral
 
 - **Un caso en el que usarías corrutinas para resolver un problema y por qué.**
 
-Respuesta
+Las corrutinas al poder ejecutarse en paralelo con otros procesos dan versatilidad a la hora de realizar diferentes cosas, por ejemplo se podrían usar en una aplicación que necesite descargar imágenes para enseñarlas, en vez de esperar a que cargue cada imágen se pueden usar corrutinas para realizar la descarga en paralelo y que la aplicación no se vea afectada por la carga de las mismas.
 
 ---
 

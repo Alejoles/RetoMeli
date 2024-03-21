@@ -30,14 +30,34 @@
 
 ### Environment Vars.
 
+MONGO_URI=mongodb://db/reto_meli
+BASE_API_URL=https://api.mercadolibre.com/
 
-- **First:** first_variable
-- **Second:** second_variable
+
+FILE_NAME=/files/technical_challenge_data.csv
+SEPARATOR=,
+ENCODING=utf-8
+BATCH_SIZE=10
+THREADS_NUMBER=20  # Number of threads that will be using the application to make requests.
+
+- **MONGO_URI:** This variable is the connection to the mongo database, it is in this form so that it connects via docker, preferably leave as is
+- **BASE_API_URL:** Variable used to store MeLi api address
+- **FILE_NAME:** FILE_NAME must have the full path in this case as we are using docker must be like this: '/files/{name_of_file}' to work properly, and the file must be inside files folder.
+- **SEPARATOR:** Separador de data en archivos de texto
+- **ENCODING:** Encoding used in the text file
+- **BATCH_SIZE:** Batch size used when reading the text file to process data in batches
+- **THREADS_NUMBER:** Number of threads that will be used when querying the API to speed up the process
 
 
-| ENV_VAR1 | What this variable is used for (Brief summary) |
+| ENV_VAR | Value |
 | --- | --- |
-| **First** | explaining |
+| **MONGO_URI** | mongodb://db/reto_meli |
+| **BASE_API_URL** | https://api.mercadolibre.com/ |
+| **FILE_NAME** | /files/technical_challenge_data.csv |
+| **SEPARATOR** | , |
+| **ENCODING** | utf-8 |
+| **BATCH_SIZE** | 20 |
+| **THREADS_NUMBER** | 20 |
 
 ---
 
@@ -85,13 +105,14 @@ This command will run the project
 ## Endpoints
 
 
-- ### api/v1/xx
+- ### [GET] localhost:8000/process
 
-```sh
-
-```
+This endpoint will execute the full program, it will read the file and then do the requests to MeLi's API.
 ---
 
+## Project Structure
+
+![alt text](structure.png)
 
 # Contact
 

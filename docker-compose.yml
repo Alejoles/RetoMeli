@@ -8,6 +8,7 @@ services:
       - "8000:8000"
     volumes: # En donde tendrán persistencia los datos
       - ./app:/app
+      - ./files:/files
     env_file:
       - .env
     command: >

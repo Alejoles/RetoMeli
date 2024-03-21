@@ -2,61 +2,98 @@ from core.querysets import ItemRepository
 import logging as log
 from api.webservice import WebService
 from .load_data import FileReader
-from . import constants
+import threading
 
 
-def process_data():
+def process_row(row, list_of_failed, semaphore):
+    """
+        Processes a row of data.
+
+        This function processes a row of data, obtaining information from Mercadolibre's API
+        based on the 'site' and 'id' fields of the row. It constructs a document to be saved
+        in the database, including information such as site, file ID, price, name, description,
+        and nickname. The document is then inserted into the database.
+
+        Parameters:
+        - row (dict): A dictionary containing data for processing, including 'site' and 'id'.
+        - list_of_failed (list): A list to store any failed data retrieval attempts.
+        - semaphore (Semaphore): A semaphore to control threads.
+
+        Return: None
+    """
+    site_id = f"{row['site']}{str(row['id'])}"
+
+    # Obtain data from mercadolibre's API
+    item_obtained = WebService().get_data_from_items(site_id)
+
+    if 'error' in item_obtained:
+        list_of_failed.append(item_obtained)
+        semaphore.release()  # Release semaphore in case of error
+        return
+
+    document_to_save = {
+        'site': row['site'],
+        'file_id': str(row['id']),
+        'price': int(item_obtained['price'])
+    }
+    # Obtain data from mercadolibre's API
+    field_name = WebService().get_data_from_categories(item_obtained['category_id'])
+    description = WebService().get_data_from_currencies(item_obtained['currency_id'])
+    nickname = WebService().get_data_from_users(item_obtained['seller_id'])
+
+    document_to_save['name'] = field_name
+    document_to_save['description'] = description
+    document_to_save['nickname'] = nickname
+
+    # Insert document inside database
+    ItemRepository.insert_one_item(document_to_save)
+    semaphore.release()  # Release semaphore after completing the insert
+
+
+def process_data_with_threads(num_threads):
+    """
+        Processes data using multiple threads.
+
+        This function reads data from a file in batches using FileReader and processes
+        each batch of data concurrently using multiple threads. Each thread acquires a
+        semaphore before starting its execution to limit the number of concurrent threads.
+        The function waits for all threads to finish their execution before returning.
+
+        Parameters:
+        - num_threads (int): The maximum number of threads to be used for processing.
+
+        Returns:
+        dict: A dictionary containing the result of the operation, including a message
+        indicating the success or failure of the operation and an HTTP status code.
+    """
     try:
         file_reader = FileReader()
-        webservice = WebService()
-        list_of_ids = []
-        list_of_documents = []
         list_of_failed = []
-        index = 0
-        # Iterate over batches of data and process them
+        threads = []
+        semaphore = threading.Semaphore(num_threads)
+
+        # Iterating over batches of data and processing them
         for batch in file_reader.read_file():
-            # Process each batch of data
+            # Process each batch of data in one thread
             for row in batch:
-                site_id = f"{row['site']}{str(row['id'])}"
-                list_of_ids.append(site_id)
-                if (len(list_of_ids) == int(constants.MULTIGET_SIZE) or
-                   len(batch) < int(constants.BATCH_SIZE) or
-                   index == len(batch) - 1):
-                    index += 1
-                    # Get items from mercadolibre's api through a multiget
-                    items_obtained = webservice.get_data_from_items(list_of_ids)
-                    if items_obtained is None:
-                        list_of_failed.extend(list_of_ids)
-                        list_of_ids = []
-                        continue
-                    for item in items_obtained:
-                        document_to_save = {}
-                        document_to_save['site'] = row['site']
-                        document_to_save['file_id'] = str(row['id'])
-                        document_to_save['price'] = int(item['body']['price'])
-                        document_to_save['start_time'] = item['body']['start_time']
+                semaphore.acquire()  # Acquiring the semaphore before starting a thread
+                thread = threading.Thread(target=process_row, args=(row, list_of_failed, semaphore))
+                thread.start()
+                threads.append(thread)
 
-                        field_name = webservice.get_data_from_categories(item['body']['category_id'])
-                        description = webservice.get_data_from_currencies(item['body']['currency_id'])
-                        nickname = webservice.get_data_from_users(item['body']['seller_id'])
+        # Wait for all threads to finish
+        for thread in threads:
+            thread.join()
 
-                        document_to_save['name'] = field_name
-                        document_to_save['description'] = description
-                        document_to_save['nickname'] = nickname
-
-                        # Could be used for inserting several documents at once
-                        list_of_documents.append(document_to_save)
-
-                        ItemRepository.insert_one_item(document_to_save)
-                    list_of_ids = []
+        print(list_of_failed)
 
         return {
-                "message": "Successfully executed",
-                "http_code": 200
-            }
+            "message": "Successfully Executed",
+            "http_code": 200
+        }
     except Exception as e:
         log.error(f"An error has been found inside process_data, Error: {e}")
         return {
-                "message": "Internal Server Error",
+                "message": f"Internal Server Error, datails: {e}",
                 "http_code": 500
             }
