@@ -6,7 +6,7 @@ import threading
 from .helpers import GeneralHelpers
 
 
-def process_row(row, list_of_failed, semaphore):
+def process_row(row, list_of_failed, semaphore, items_processed):
     """
         Processes a row of data.
 
@@ -25,7 +25,7 @@ def process_row(row, list_of_failed, semaphore):
     site_id = f"{row['site']}{str(row['id'])}"
 
     # Obtain data from mercadolibre's API
-    item_obtained = WebService().get_data_from_items(site_id)
+    item_obtained = WebService().get_data_from_items(site_id, items_processed)
 
     if 'error' in item_obtained:
         list_of_failed.append(item_obtained)
@@ -39,8 +39,22 @@ def process_row(row, list_of_failed, semaphore):
     }
     # Obtain data from mercadolibre's API
     field_name = WebService().get_data_from_categories(item_obtained['category_id'])
+    if 'error' in field_name:
+        list_of_failed.append(field_name)
+        semaphore.release()  # Release semaphore in case of error
+        return
+
     description = WebService().get_data_from_currencies(item_obtained['currency_id'])
+    if 'error' in description:
+        list_of_failed.append(description)
+        semaphore.release()  # Release semaphore in case of error
+        return
+
     nickname = WebService().get_data_from_users(item_obtained['seller_id'])
+    if 'error' in nickname:
+        list_of_failed.append(nickname)
+        semaphore.release()  # Release semaphore in case of error
+        return
 
     document_to_save['name'] = field_name
     document_to_save['description'] = description
@@ -72,13 +86,15 @@ def process_data_with_threads(num_threads):
         list_of_failed = []
         threads = []
         semaphore = threading.Semaphore(num_threads)
+        items_processed = [0]
 
         # Iterating over batches of data and processing them
         for batch in file_reader.read_file():
             # Process each batch of data in one thread
             for row in batch:
                 semaphore.acquire()  # Acquiring the semaphore before starting a thread
-                thread = threading.Thread(target=process_row, args=(row, list_of_failed, semaphore))
+                thread = threading.Thread(target=process_row, args=(row, list_of_failed,
+                                                                    semaphore, items_processed))
                 thread.start()
                 threads.append(thread)
 
@@ -88,6 +104,8 @@ def process_data_with_threads(num_threads):
         # Wait for all threads to finish
         for thread in threads:
             thread.join()
+
+        print(f"!!!!!!!!!! {items_processed}")
 
         return {
             "message": "Successfully Executed",

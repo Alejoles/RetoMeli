@@ -38,7 +38,7 @@ class WebService:
     def __init__(self) -> None:
         self.base_url = constants.BASE_API_URL
 
-    def get_data_from_items(self, id: str):
+    def get_data_from_items(self, id: str, items_processed):
         """
             Method used to fetch data from the item endpoint.
         """
@@ -51,8 +51,11 @@ class WebService:
                 return data
             return data
         else:
+            items_processed[0] += 1
             print(f"Error while getting items. Status code: : {response.status_code}")
             data = response.json()
+            if 'error' not in data:
+                data['error'] = f"An error has found status code: {response.status_code}"
             data["id"] = id
             return data
 
@@ -65,6 +68,9 @@ class WebService:
         response = requests.get(categories_url)
         if response.status_code == 200:
             data = response.json()
+            if 'name' not in data:
+                data['error'] = "Categorie do not have name"
+                return data
             return data['name']
         else:
             print(f"Error while getting categories. Status code: {response.status_code}")
@@ -79,6 +85,9 @@ class WebService:
         response = requests.get(currency_url)
         if response.status_code == 200:
             data = response.json()
+            if 'description' not in data:
+                data['error'] = "Currency do not have description"
+                return data
             return data['description']
         else:
             print(f"Error while getting currencies. Status code: {response.status_code}")
@@ -93,6 +102,9 @@ class WebService:
         response = requests.get(users_url)
         if response.status_code == 200:
             data = response.json()
+            if 'nickname' not in data:
+                data['error'] = "User do not have nickname"
+                return data
             return data['nickname']
         else:
             print(f"Error while getting user. Status code: {response.status_code}")
