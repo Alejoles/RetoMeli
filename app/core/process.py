@@ -4,6 +4,7 @@ from api.webservice import WebService
 from .load_data import FileReader
 import threading
 from .helpers import GeneralHelpers
+from . import constants
 
 
 def process_row(row, list_of_failed, semaphore, items_processed):
@@ -105,10 +106,12 @@ def process_data_with_threads(num_threads):
                 site_id = f"{row['site']}{str(row['id'])}"
 
                 # --------------- Checking if id exists in cache ---------------
-                # exists_in_cache = helpers.revisar_cache(site_id) # Ocupaba más memoria
-                exists_in_cache = helpers.buscar_por_id(site_id)
-                if exists_in_cache:
-                    continue
+                if constants.USE_CACHE == "True":
+                    # exists_in_cache = helpers.revisar_cache(site_id) # TODO: Ocupaba más memoria
+                    print("Using cache")
+                    exists_in_cache = helpers.buscar_por_id(site_id)
+                    if exists_in_cache:
+                        continue
 
                 semaphore.acquire()  # Acquiring the semaphore before starting a thread
                 thread = threading.Thread(target=process_row, args=(row, list_of_failed,
@@ -116,7 +119,7 @@ def process_data_with_threads(num_threads):
                 thread.start()
                 threads.append(thread)
 
-        helpers.list_to_jsonl(list_of_failed, "/files/data_failed_test.jsonl")
+        # helpers.list_to_jsonl(list_of_failed, "/files/data_failed_test.jsonl") # TODO: More details
         list_of_failed = []
 
         # Wait for all threads to finish
