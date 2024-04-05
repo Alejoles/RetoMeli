@@ -45,6 +45,7 @@ class WebService:
         items_url = self.base_url + f"items/{id}"
         response = requests.get(items_url)
         if response.status_code == 200:
+            print("Getting item from url")
             data = response.json()
             if 'price' not in data:
                 data['error'] = "Item do not have price"
